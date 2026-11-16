@@ -5,17 +5,18 @@ use App\Models\Livre;
 use App\Models\Auteur;
 use App\Providers\View;
 use App\Providers\Validator;
+use App\Providers\Auth;
 
 
 class LivreController{
     
-    public function index(){
+    public function index(){ //Liste les livres et leurs auteurs
         $crud = new Livre;
         $livres = $crud->selectAvecAuteur();
         return View::render('livre/index', ['livres' => $livres]);
     }
 
-    public function show(array $data = []){
+    public function show(array $data = []){ //Affiche les details d'un livre
         if(isset($data['id'])){
             $crud = new Livre;
             $livre = $crud->selectId($data['id']);
@@ -28,13 +29,17 @@ class LivreController{
         return View::redirect('livres');
     }
 
-    public function create(){
+    public function create(){ //Affiche le form pour ajouter un livre
+        Auth::session();
+        Auth::privilege(2);
         $crudAuteur = new Auteur;
         $auteurs = $crudAuteur->select('nom');
         return View::render('livre/create', ['auteurs' => $auteurs]);
     }
 
-    public function store(array $data){
+    public function store(array $data){ //Enregistre dans la DB les infos du livre a ajouter
+        Auth::session();
+        Auth::privilege(2);
         $val = new Validator;
         $val->field('titre', $data['titre'])->required()->max(100);
         $val->field('prix', $data['prix'])->required()->numeric();
@@ -56,7 +61,9 @@ class LivreController{
         }
     }
 
-    public function edit(array $data = []){
+    public function edit(array $data = []){ //Affiche le form de modification d'un livre
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Livre;
             $livre = $crud->selectId($data['id']);
@@ -69,7 +76,9 @@ class LivreController{
         return View::redirect('livres');
     }
 
-    public function update(array $data, $get = []){
+    public function update(array $data, $get = []){ //Enregistre les modifications apporté a un livre
+        Auth::session();
+        Auth::privilege(1);
         if(isset($get['id'])){
             $val = new Validator;
             $val->field('titre', $data['titre'])->required()->max(100);
@@ -91,7 +100,9 @@ class LivreController{
         return View::redirect('livres');
     }
 
-    public function delete(array $data){
+    public function delete(array $data){ //Efface un livre de la DB
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Livre;
             if($crud->delete($data['id'])){

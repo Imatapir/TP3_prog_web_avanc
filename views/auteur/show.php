@@ -24,11 +24,13 @@
             {% endfor %}
         </tbody>
     </table>
-    <div class="actions">
-        <a href="{{base}}/auteur/edit?id={{auteur.id}}" class="btn">Modifier</a>
-        <form method="post" action="{{base}}/auteur/delete" onsubmit="return confirm('Supprimer cet auteur ?')">
-            <input type="hidden" name="id" value="{{auteur.id}}">
-            <input type="submit" class="btn red" value="Supprimer">
-        </form>
-    </div>
+    {% if not guest and session.user_privilege == 1 %}
+        <div class="actions">
+            <a href="{{base}}/auteur/edit?id={{auteur.id}}" class="btn">Modifier</a>
+            <form method="post" action="{{base}}/auteur/delete" onsubmit="return confirm('Supprimer cet auteur ?')">
+                <input type="hidden" name="id" value="{{auteur.id}}">
+                <input type="submit" class="btn red" value="Supprimer">
+            </form>
+        </div>
+    {% endif %}
 {{ include('layouts/footer.php') }}

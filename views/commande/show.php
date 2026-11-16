@@ -19,7 +19,7 @@
                 <td><a href="{{base}}/livre/show?id={{ligne.livre_id}}">{{ ligne.titre }}</a></td>
                 <td>{{ ligne.prix|number_format(2) }} $</td>
                 <td>{{ ligne.quantite }}</td>
-                <td>{{ ligne.sous_total|number_format(2) }} $ $</td>
+                <td>{{ ligne.sous_total|number_format(2) }} $</td>
             </tr>
             {% else %}
             <tr>
@@ -29,4 +29,5 @@
         </tbody>
     </table>
     <p><strong>Total : </strong>{{ total|number_format(2) }} $</p>
+    <a href="{{base}}/commande/pdf?id={{commande.id}}" class="btn">Télécharger la facture (PDF)</a>
 {{ include('layouts/footer.php') }}

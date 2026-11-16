@@ -24,5 +24,7 @@
             {% endfor %}
         </tbody>
     </table>
-    <a href="{{base}}/livre/create" class="btn">Nouveau livre</a>
+    {% if not guest and (session.user_privilege == 1 or session.user_privilege == 2) %}
+        <a href="{{base}}/livre/create" class="btn">Nouveau livre</a>
+    {% endif %}
 {{ include('layouts/footer.php') }}

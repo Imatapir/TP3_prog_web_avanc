@@ -1,4 +1,5 @@
 <?php
+
 use App\Routes\Route;
 
 Route::get('/', 'HomeController@index');
@@ -33,6 +34,18 @@ Route::get('/commande/create', 'CommandeController@create');
 Route::post('/commande/ajouter', 'CommandeController@ajouter');
 Route::post('/commande/vider', 'CommandeController@vider');
 Route::post('/commande/create', 'CommandeController@store');
+
+Route::get('/login', 'AuthController@create');
+Route::post('/login', 'AuthController@store');
+Route::get('/logout', 'AuthController@delete');
+
+Route::get('/user/create', 'UserController@create');
+Route::post('/user/create', 'UserController@store');
+
+Route::get('/journal', 'JournalController@index');
+
+Route::get('/commande/pdf', 'CommandeController@pdf');
+
 
 
 Route::dispatch();

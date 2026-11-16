@@ -7,7 +7,7 @@ class Commande extends CRUD{
     protected $primaryKey = 'id';
     protected $fillable = ['client_id', 'date_commande'];
 
-    public function selectAvecClient(){
+    public function selectAvecClient(){ //retourne la commande du client avec son nom et la somme
         $sql = "SELECT commande.id, commande.date_commande, client.name AS client_name,
                        SUM(commande_livre.quantite * livre.prix) AS total
                 FROM commande

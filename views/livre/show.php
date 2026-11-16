@@ -8,11 +8,13 @@
     <p><strong>Stock : </strong>{{ livre.stock }}
         {% if livre.stock > 0 %}(Disponible){% else %}(Rupture de stock){% endif %}
     </p>
-    <div class="actions">
-        <a href="{{base}}/livre/edit?id={{livre.id}}" class="btn">Modifier</a>
-        <form method="post" action="{{base}}/livre/delete" onsubmit="return confirm('Supprimer ce livre ?')">
-            <input type="hidden" name="id" value="{{livre.id}}">
-            <input type="submit" class="btn red" value="Supprimer">
-        </form>
-    </div>
+    {% if not guest and session.user_privilege == 1 %}
+        <div class="actions">
+            <a href="{{base}}/livre/edit?id={{livre.id}}" class="btn">Modifier</a>
+            <form method="post" action="{{base}}/livre/delete" onsubmit="return confirm('Supprimer ce livre ?')">
+                <input type="hidden" name="id" value="{{livre.id}}">
+                <input type="submit" class="btn red" value="Supprimer">
+            </form>
+        </div>
+    {% endif %}
 {{ include('layouts/footer.php') }}

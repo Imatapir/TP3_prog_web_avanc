@@ -72,6 +72,22 @@ nav ul li a:hover {
     border-bottom-color: var(--gold);
 }
 
+nav ul li.slot {
+    margin-left: auto;
+}
+
+nav ul li.slot a {
+    min-width: 110px;
+    text-align: center;
+}
+
+nav ul li.user-info {
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    padding: 16px 18px;
+}
+
 table {
     width: calc(100% - 60px);
     margin: 10px 30px 20px 30px;
@@ -119,6 +135,8 @@ form label {
 }
 
 form input[type="text"],
+form input[type="email"],
+form input[type="password"],
 form input[type="number"],
 form input[type="date"],
 form select {
@@ -210,4 +228,11 @@ main > p {
 main > form {
     margin: 20px 30px;
     max-width: 480px;
+}
+
+body.admin {
+    --paper: #ccd9eb;
+    --gold: #ffffff;
+    --leather: #1f4e79;
+    --leather-dark: #163a5a;
 }

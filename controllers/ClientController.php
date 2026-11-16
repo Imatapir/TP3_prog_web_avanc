@@ -5,15 +5,20 @@ use App\Models\Client;
 use App\Models\Commande;
 use App\Providers\View;
 use App\Providers\Validator;
+use App\Providers\Auth;
 
 class ClientController{
-    public function index(){
+    public function index(){ //Liste les clients
+        Auth::session();
+        Auth::privilege(1);
         $crud = new Client;
         $clients = $crud->select('name');
         return View::render('client/index', ['clients' => $clients]);
     }
 
-    public function show(array $data = []){
+    public function show(array $data = []){ //Affiche les details d'un client
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Client;
             $client = $crud->selectId($data['id']);
@@ -26,11 +31,15 @@ class ClientController{
         return View::redirect('clients');
     }
 
-    public function create(){
+    public function create(){ //Affiche le form de creation d'un client
+        Auth::session();
+        Auth::privilege(1);
         return View::render('client/create');
     }
 
-    public function store(array $data){
+    public function store(array $data){ //Enregistre et valide la creation du client
+        Auth::session();
+        Auth::privilege(1);
         $val = new Validator;
         $val->field('name', $data['name'], 'nom')->required()->max(50);
         $val->field('address', $data['address'], 'addresse')->max(50);
@@ -51,7 +60,9 @@ class ClientController{
         }
     }
 
-    public function edit(array $data = []){
+    public function edit(array $data = []){ //Affiche le form pour modifier un client
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Client;
             $client = $crud->selectId($data['id']);
@@ -62,7 +73,9 @@ class ClientController{
         return View::redirect('clients');
     }
 
-    public function update(array $data, $get = []){
+    public function update(array $data, $get = []){ //Enregistre les modification faite dans l'edit
+        Auth::session();
+        Auth::privilege(1);
         if(isset($get['id'])){
             $val = new Validator;
             $val->field('name', $data['name'], 'nom')->required()->max(50);
@@ -83,7 +96,9 @@ class ClientController{
         return View::redirect('clients');
     }
 
-    public function delete(array $data){
+    public function delete(array $data){ //Efface un client de la DB
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Client;
             if($crud->delete($data['id'])){

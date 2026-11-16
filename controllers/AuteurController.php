@@ -5,15 +5,17 @@ use App\Models\Auteur;
 use App\Models\Livre;
 use App\Providers\View;
 use App\Providers\Validator;
+use App\Providers\Auth;
+
 
 class AuteurController{
-    public function index(){
+    public function index(){ //Liste des auteurs
         $crud = new Auteur;
         $auteurs = $crud->select('nom');
         return View::render('auteur/index', ['auteurs' => $auteurs]);
     }
 
-    public function show(array $data = []){
+    public function show(array $data = []){ //Detail d'un auteur et ses livres
         if(isset($data['id'])){
             $crud = new Auteur;
             $auteur = $crud->selectId($data['id']);
@@ -26,11 +28,15 @@ class AuteurController{
         return View::redirect('auteurs');
     }
 
-    public function create(){
+    public function create(){ //Form pour ajouter un auteur
+        Auth::session();
+        Auth::privilege(2);
         return View::render('auteur/create');
     }
 
-    public function store(array $data){
+    public function store(array $data){ //Enregistre un auteur dans la BD
+        Auth::session();
+        Auth::privilege(2);
         $val = new Validator;
         $val->field('nom', $data['nom'])->required()->max(30);
         $val->field('prenom', $data['prenom'])->required()->max(30);
@@ -48,7 +54,9 @@ class AuteurController{
         }
     }
 
-    public function edit(array $data = []){
+    public function edit(array $data = []){ //Form pour modifier une entree auteur deja faite
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Auteur;
             $auteur = $crud->selectId($data['id']);
@@ -59,7 +67,9 @@ class AuteurController{
         return View::redirect('auteurs');
     }
 
-    public function update(array $data, $get = []){
+    public function update(array $data, $get = []){ //Enregistre les modif faites dans edit
+        Auth::session();
+        Auth::privilege(1);
         if(isset($get['id'])){
             $val = new Validator;
             $val->field('nom', $data['nom'])->required()->max(30);
@@ -77,7 +87,9 @@ class AuteurController{
         return View::redirect('auteurs');
     }
 
-    public function delete(array $data){
+    public function delete(array $data){ //Efface de la DB un auteur
+        Auth::session();
+        Auth::privilege(1);
         if(isset($data['id'])){
             $crud = new Auteur;
             if($crud->delete($data['id'])){

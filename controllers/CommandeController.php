@@ -8,41 +8,66 @@ use App\Models\Client;
 use App\Models\Livre;
 use App\Providers\View;
 use App\Providers\Validator;
+use App\Providers\Auth;
+use App\Providers\Facture;
 
 class CommandeController{
 
-    public function index(){
+    public function index(){ //Liste les commandes
+        Auth::session();
+        Auth::privilege(3);
         $crud = new Commande;
         $commandes = $crud->selectAvecClient();
         return View::render('commande/index', ['commandes' => $commandes]);
     }
 
-    public function show(array $data = []){
+    private function chargerCommande($id){ //Load les detail d'une commande
+        $crud = new Commande;
+        $commande = $crud->selectId($id);
+        if(!$commande){
+            return false;
+        }
+
+        $crudClient = new Client;
+        $client = $crudClient->selectId($commande['client_id']);
+        $crudLigne = new CommandeLivre;
+        $lignes = $crudLigne->selectParCommande($id);
+        $total = 0;
+        foreach($lignes as $i => $ligne){
+            $lignes[$i]['sous_total'] = $ligne['prix'] * $ligne['quantite'];
+            $total += $lignes[$i]['sous_total'];
+        }
+        return ['commande' => $commande, 'client' => $client, 'lignes' => $lignes, 'total' => $total];
+    }
+
+    public function show(array $data = []){ //Affiche une commande et son client
+        Auth::session();
+        Auth::privilege(3);
         if(isset($data['id'])){
-            $crud = new Commande;
-            $commande = $crud->selectId($data['id']);
-            if($commande){
-                $crudClient = new Client;
-                $client = $crudClient->selectId($commande['client_id']);
-                $crudLigne = new CommandeLivre;
-                $lignes = $crudLigne->selectParCommande($data['id']);
-                $total = 0;
-                foreach($lignes as $i => $ligne){
-                    $lignes[$i]['sous_total'] = $ligne['prix'] * $ligne['quantite'];
-                    $total += $lignes[$i]['sous_total'];
-                }
-                return View::render('commande/show', [
-                    'commande' => $commande,
-                    'client' => $client,
-                    'lignes' => $lignes,
-                    'total' => $total
-                ]);
+            $donnees = $this->chargerCommande($data['id']);
+            if($donnees){
+                return View::render('commande/show', $donnees);
             }
         }
         return View::redirect('commandes');
     }
 
-        private function donneesPanier(){
+    public function pdf(array $data = []){ //Genere et enregistre un pdf de la facture selectionnée
+        Auth::session();
+        Auth::privilege(3);
+        if(isset($data['id'])){
+            $donnees = $this->chargerCommande($data['id']);
+            if($donnees){
+                return Facture::generer($donnees['commande'], $donnees['client'], $donnees['lignes'], $donnees['total']);
+            }
+        }
+        return View::redirect('commandes');
+    }
+
+            
+            
+
+    private function donneesPanier(){ // Prepare les data du paniers gardé en session
         if(!isset($_SESSION['panier'])){
             $_SESSION['panier'] = [];
         }
@@ -71,11 +96,15 @@ class CommandeController{
         ];
     }
 
-    public function create(){
+    public function create(){ //Affiche le formulaire de creation de commande
+        Auth::session(); 
+        Auth::privilege(3);
         return View::render('commande/create', $this->donneesPanier());
     }
 
-    public function ajouter(array $data){
+    public function ajouter(array $data){ //Valide et ajoute un livre au panier
+        Auth::session();
+        Auth::privilege(3);
         $val = new Validator;
         $val->field('livre_id', $data['livre_id'], 'livre')->int()->required('Vous devez choisir un livre');
         $val->field('quantite', $data['quantite'], 'quantité')->required()->int();
@@ -91,12 +120,16 @@ class CommandeController{
         return View::render('commande/create', array_merge($this->donneesPanier(), ['errors' => $errors]));
     }
 
-    public function vider(){
+    public function vider(){ //Vide le panier
+        Auth::session();
+        Auth::privilege(3);
         $_SESSION['panier'] = [];
         return View::redirect('commande/create');
     }
 
-        public function store(array $data){
+    public function store(array $data){ //Enregistre dans la DB la commande et ses details
+        Auth::session();
+        Auth::privilege(3);
         $val = new Validator;
         $val->field('client_id', $data['client_id'], 'client')->int()->required('Vous devez choisir un client');
 
